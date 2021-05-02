@@ -5,23 +5,24 @@ const app = express();
 const cors = require("cors");
 
 app.use(cors());
+app.use(express.static("build"));
 app.use(express.json());
 
 let persons = [
   {
     id: 1,
     name: "Desmond",
-    phone: "08102228633",
+    phoneNumber: "08102228633",
   },
   {
     id: 2,
     name: "Faith",
-    phone: "07010100882",
+    phoneNumber: "07010100882",
   },
   {
     id: 3,
     name: "Williams",
-    phone: "08126149680",
+    phoneNumber: "08126149680",
   },
 ];
 
@@ -62,7 +63,7 @@ app.post("/api/persons", (request, response) => {
   const body = request.body;
   const nameexist = persons.find((person) => person.name === body.name);
 
-  if (!body.name || !body.phone) {
+  if (!body.name || !body.phoneNumber) {
     return response.status(400).json({
       error: "Name or Phonenumber is missing",
     });
@@ -76,7 +77,7 @@ app.post("/api/persons", (request, response) => {
   const person = {
     id: Math.random().toString(36).substring(2, 10),
     name: body.name,
-    phone: body.phone,
+    phoneNumber: body.phoneNumber,
     dateAdded: new Date(),
   };
 
