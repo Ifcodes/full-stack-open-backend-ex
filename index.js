@@ -1,5 +1,7 @@
+require("dotenv").config();
 const express = require("express");
-const { response, request } = require("express");
+// const { response, request } = require("express");
+const Phonebook = require("./models/phonebook");
 // const { response } = require("express");
 const app = express();
 const cors = require("cors");
@@ -8,26 +10,28 @@ app.use(cors());
 app.use(express.static("build"));
 app.use(express.json());
 
-let persons = [
-  {
-    id: 1,
-    name: "Desmond",
-    phoneNumber: "08102228633",
-  },
-  {
-    id: 2,
-    name: "Faith",
-    phoneNumber: "07010100882",
-  },
-  {
-    id: 3,
-    name: "Williams",
-    phoneNumber: "08126149680",
-  },
-];
+// let persons = [
+//   {
+//     id: 1,
+//     name: "Desmond",
+//     phoneNumber: "08102228633",
+//   },
+//   {
+//     id: 2,
+//     name: "Faith",
+//     phoneNumber: "07010100882",
+//   },
+//   {
+//     id: 3,
+//     name: "Williams",
+//     phoneNumber: "08126149680",
+//   },
+// ];
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Phonebook.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -61,29 +65,34 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-  const nameexist = persons.find((person) => person.name === body.name);
 
-  if (!body.name || !body.phoneNumber) {
-    return response.status(400).json({
-      error: "Name or Phonenumber is missing",
-    });
-  }
-  if (nameexist) {
-    return response.status(400).json({
-      error: "Name already exist",
-    });
-  }
+  // const nameexist = Phonebook.find({ name: body.name }).then((result) => {
+  //   console.log(result);
+  // });
+  // console.log(nameexist);
 
-  const person = {
-    id: Math.random().toString(36).substring(2, 10),
+  // if (!body.name || !body.phoneNumber) {
+  //   return response.status(400).json({
+  //     error: "Name or Phonenumber is missing",
+  //   });
+  // }
+  // if (nameexist) {
+  //   console.log(nameexist);
+  //   return response.status(400).json({
+  //     error: "Name already exist",
+  //   });
+  // }
+
+  const person = new Phonebook({
     name: body.name,
-    phoneNumber: body.phoneNumber,
+    number: body.number,
     dateAdded: new Date(),
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person.save().then((savedContact) => {
+    response.json(savedContact);
+  });
 });
-const PORT = process.env.PORT || 3002;
+
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
