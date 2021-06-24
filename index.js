@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 // const { response, request } = require("express");
 const Phonebook = require("./models/phonebook");
