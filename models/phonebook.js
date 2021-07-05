@@ -1,9 +1,9 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI
 
-console.log("connecting to", url);
+console.log('connecting to', url)
 
 mongoose
   .connect(url, {
@@ -12,27 +12,39 @@ mongoose
     useFindAndModify: false,
     useCreateIndex: true,
   })
-  .then((result) => {
-    console.log("connected to MongoDB");
+  .then(() => {
+    console.log('connected to MongoDB')
   })
   .catch((error) => {
-    console.log("error connecting to MongoDB", error.message);
-  });
+    console.log('error connecting to MongoDB', error.message)
+  })
 
 const phonebookSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-phonebookSchema.set("to JSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject._v;
+  name: {
+    type: String,
+    minLength: [3, 'Must contain at least 3 characters'],
+    required: true,
+    unique: true,
   },
-});
+  number: {
+    type: String,
+    minLength: 8,
+    required: true,
+    unique: true,
+  },
+})
 
-module.exports = mongoose.model("Phonbook", phonebookSchema);
+phonebookSchema.plugin(uniqueValidator)
+
+phonebookSchema.set('to JSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject._v
+  },
+})
+
+module.exports = mongoose.model('Phonbook', phonebookSchema)
 
 //   contact.save().then((result) => {
 //     console.log(`added ${name} number ${number} to phonebook`);
